@@ -1,18 +1,18 @@
 #ifndef my_Vector_H
 #define my_Vector_H
 /*
-	this is a vector header file that takes much heavy ""inspiration"" from,
+	this is a vector header file that takes much heavy ""inspiration"" from
 	One Lone Coder, a.k.a javidx9, creator of the OLC Pixel Game Engine;
 
-	you may see the more epic implementation of a templated mathematical vector,
-	foud here, at his github: 
+	you may see the more epic implementation of a templated mathematical vector
+	found here:
 	https://github.com/OneLoneCoder/olcPixelGameEngine/blob/master/olcPixelGameEngine.h
 
 	he is a cool code artist.
 	check him out at: 
 	https://www.youtube.com/c/javidx9
 
-	anyways, here's my rough-looking code:
+	anyways, here's somewhat 'original' code:
 */
 
 template <class T>
