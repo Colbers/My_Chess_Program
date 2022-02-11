@@ -160,7 +160,6 @@
     <ClCompile Include="Move_Logic.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="algorithm.h" />
     <ClInclude Include="Board.h" />
     <ClInclude Include="Direction.h" />
     <ClInclude Include="Game.h" />

@@ -54,6 +54,11 @@ struct Motion {
 	}
 };
 
+template <typename T>
+vector2d<T> proceed(Motion& motion) {
+
+}
+
 struct Suppose {
 	Suppose(Motion&);
 	~Suppose();

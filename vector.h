@@ -1,25 +1,19 @@
 #ifndef my_Vector_H
 #define my_Vector_H
+/*
+	this is a vector header file that takes much heavy ""inspiration"" from,
+	One Lone Coder, a.k.a javidx9, creator of the OLC Pixel Game Engine;
 
-struct biBoolean {
-	biBoolean(bool _a, bool _b) :
-		a {_a}, b {_b}
-	{}
+	you may see the more epic implementation of a templated mathematical vector,
+	foud here, at his github: 
+	https://github.com/OneLoneCoder/olcPixelGameEngine/blob/master/olcPixelGameEngine.h
 
-	bool a{};
-	bool b{};
+	he is a cool code artist.
+	check him out at: 
+	https://www.youtube.com/c/javidx9
 
-	void set_A(bool _a) { a = _a; }
-	void set_B(bool _b) { b = _b; }
-
-	inline operator bool() const { return (a && b); }
-	inline bool operator!() const { return (!a && !b); }
-
-	const bool& x{ a };
-	const bool& y{ b };
-	const bool& one{ a };
-	const bool& two{ b };
-};
+	anyways, here's my rough-looking code:
+*/
 
 template <class T>
 struct vector2d {
@@ -43,19 +37,11 @@ struct vector2d {
 	vector2d transpose(const vector2d& vec) {
 		return { vec.y, vec.x };
 	}
-	//vector2d reflect(bool bX = 1, bool bY = 1) {
-	//	if (bX && bY) return vector2d(-x, -y);
-	//	if (bX) return vector2d(-x, y);
-	//	if (bY) return vector2d(x, -y);
-	//	else    return vector2d(x, y);
-
-	//}
-
-	vector2d reflect(biBoolean bib) {
+	vector2d reflect(bool bX = 1, bool bY = 1) {
 		T _x{ x }, _y{ y };
-		if(bib.a) _x = -x;
-		if(bib.b) _y = -y;
-		return { x, y };
+		if (bX) _x = -x;
+		if (bY) _y = -y;
+		return { _x,_y };
 	}
 
 	const std::string str() const {
@@ -65,7 +51,12 @@ struct vector2d {
 			+ std::to_string(this->y) + ")";
 	}
 
-	inline bool operator<(vector2d& vec) { return (this->x < vec.x) && (this->y < vec.y); }
+	inline bool operator<(const vector2d& vec) const {
+		return (this->x < vec.x) && (this->y < vec.y);
+	}
+	inline bool operator<=(const vector2d& vec) const {
+		return (this->x <= vec.x) && (this->y <= vec.y);
+	}
 
 	vector2d& operator=(const vector2d& vec) = default; 
 	vector2d operator*(const T& rhs) { return vector2d(this->x * rhs, this->y * rhs); }

@@ -2,7 +2,7 @@
 
 Chess::Game::Game() : state{ Game_State::Stasis } {}
 
-Chess::Game::~Game() { delete board; delete player; }
+Chess::Game::~Game() {}
 
 void Chess::Game::Next_Turn() {
 	switch (game_type) {

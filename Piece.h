@@ -34,6 +34,7 @@ public:
 
 protected:
 	position2d_t atPos{};
+	cardinal facing{ cardinal::null };
 	Team p_team{ Team::null };
 	Type p_type{ Type::null };
 	bool initPos{ true };
@@ -152,8 +153,7 @@ public:
 class Pawn : public Piece {
 public:
 	Pawn(Team _team, const pos_t& pos_x, const pos_t& pos_y, const direction& _face) :
-		Piece(_team, Type::pawn, pos_x, pos_y), facing{ _face }
-	{}
+		Piece(_team, Type::pawn, pos_x, pos_y)	{}
 
 	Pawn(Team _team, const position2d_t& pos, const direction& _face) :
 		Pawn(_team, pos.x, pos.y, _face)
@@ -168,7 +168,6 @@ public:
 
 	bool canMove(const position2d_t&);
 	bool canMove(const pos_t x, const pos_t y) { return canMove(position2d_t(x, y)); }
-	direction facing;
 };
 
 //namespace alt {

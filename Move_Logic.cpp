@@ -10,7 +10,6 @@ void Board::put(Piece* piece) {
 }
 
 Cell* iter_thru_cell(Board* board, Trajectory traj){
-	assert(board->size < sizeof(position2d_t));
 
 	auto current{ traj.origin };
 	auto direction{ traj.direction };
@@ -75,9 +74,8 @@ Suppose::~Suppose() { //undo hypothetical
 }
 
 bool check_safe(Motion& motion, Piece* crux) {
-	int i{ 1 }; //this will be used later
-
-	auto position = [&](const position2d_t& pos) {
+					
+	auto position = [&motion](const position2d_t& pos) {
 		return motion.board->position(pos);
 	};
 
@@ -85,17 +83,17 @@ bool check_safe(Motion& motion, Piece* crux) {
 		return ::proceed(pos, motion.trajectory.direction, n);
 	};
 
-	auto check = [&]() {
-		return iter_thru_cell(motion.board, { crux->pos, cardinal(i) });
+	auto check = [&](int _dir) { 
+		return iter_thru_cell(motion.board, { crux->pos, cardinal(_dir) });
 	};
 
-	auto danger_piece = [&](Cell* cell) { 
+	auto danger_piece = [&crux](Cell* cell) { 
 		return (cell->piece->team != crux->team)
 			&& cell->piece->canMove(crux->pos);
 	};
 
 	auto sneaky_knight = [&]() {
-		for (auto c{ 1 }; c <= 4; c++) { //NESW is 1234
+		for (auto c{ 1 }; c <= 4; c++) { // 1234 == NESW
 
 			//if north or south, proceed twice, then check east and west directions
 			//if east or west, proceed twice, then check north and south directions
@@ -131,19 +129,22 @@ bool check_safe(Motion& motion, Piece* crux) {
 
 	Suppose hypothetical{ motion }; //indeed, quite the supposition
 
-	while (i <= 8) { //eight directions to check: N E S W + NE NW SE SW
+	//anyways, carry on with the checks!
 
-		if (danger_piece(check()) || sneaky_knight()) {			
+	int O_dir[]{ 1,2,3,4,5,6,7,8 }; //direction 1: north
+
+	for (auto dir : O_dir)  { //eight directions to check: N E S W + NE NW SE SW
+
+		if (danger_piece(check(dir)) || sneaky_knight()) {			
 			return false;	//bad piece found, move is not safe
 		}
-		++i;
 	}
 	return true;	//no bad piece found, (hopefully) move is safe
 }
 
 bool Legal_Move(Motion& motion, Piece* crux) {
 
-	if ((!motion.toward <= motion.board->size)  //check 'toward' is in bounds of the board
+	if (!(motion.toward <= motion.board->size)  //check 'toward' is in bounds of the board
 
 	  || !motion.piece->canMove(motion.toward)  //check that 'piece' may reach 'toward'
 

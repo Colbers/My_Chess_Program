@@ -19,6 +19,6 @@ Cell* Board::position(const position2d_t& pos) {
 	return position(pos.x, pos.y);
 }
 
-Cell* Board::position(const char file, const char rank) {
-	return position(file, rank);
-}
+//Cell* Board::position(const char file, const char rank) {
+//	return position(file, rank);
+//}

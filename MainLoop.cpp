@@ -130,9 +130,6 @@ void Chess::Run() {
 	while (!quit) {
 
 		//draw_board(board);
-
-		std::cout << "size of Piece: " << sizeof(Piece) << '\n';
-		std::cout << "size of alt::Piece: " << sizeof(alt::Piece) << '\n';
 				
 		quit = true;
 		std::cout << "\nquit = true;\n";
