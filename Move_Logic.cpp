@@ -50,17 +50,19 @@ Suppose::Suppose(Motion& _motion) ://hypothetical move
 	ogPos{ position(_motion.piece) }, //remember where we start
 	motion{ _motion }
 {
-	Cell* cell = { motion.board->position(motion.trajectory.toward) };
+	Cell* target_cell = { motion.board->position(motion.trajectory.toward) };
 
-	if (cell->notEmpty()
-		&& (cell->piece->team != motion.piece->team)) {
+	if (target_cell->notEmpty()
+		&& (target_cell->piece->team != motion.piece->team)) {
 
-		obstacle = { motion.board, cell->piece, position(cell->piece) };
+		obstacle = { motion.board,
+                     target_cell->piece,
+                     position(target_cell->piece) };
 
-		cell->release();
+		target_cell->release();
 		Move(motion);
 	}
-	else if (cell->isEmpty()) {
+	else if (target_cell->isEmpty()) {
 		Move(motion);
 	}
 }

@@ -116,6 +116,9 @@ void draw_board(Board& board, cardinal facing = cardinal::north) {
 	case cardinal::west:
 		draw_west(board);
 		break;
+            
+        default:
+            break;
 	}
 }
 
@@ -124,13 +127,14 @@ void Chess::Run() {
 	bool quit{ false };
 
 	Board board;
-	Player player1;
-	Player player2;
 
 	while (!quit) {
 
-		//draw_board(board);
-				
+		draw_board(board);
+        
+        std::cout << "sizeof(Traditional_Set): " <<
+        sizeof(position2d_t) << '\n';
+        
 		quit = true;
 		std::cout << "\nquit = true;\n";
 	}

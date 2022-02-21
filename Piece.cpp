@@ -1,26 +1,18 @@
 #include "Piece.h"
 
-static pos_t s_x{ 0 };
-static pos_t s_y{ 0 };
-
-
-Piece::Piece(Team _team = Team::null,
-			 Type _type = Type::null,
-		 const pos_t& x = s_x,
-		 const pos_t& y = s_y) :
-				p_team{ _team },
-				p_type{ _type },
-				atPos{ x, y },
-				pos{ atPos }
+Piece::Piece(Type type) : p_type{type}
 {}
 
-Piece::Piece(Type type, const pos_t& x, const pos_t& y) :
-	Piece(Team::null, type, x, y) 
+Piece::Piece(Type type,
+             const pos_t& x,
+             const pos_t& y) :
+    p_type{type},
+    atPos{x,y}
 {}
 
-Piece::Piece(Team team, Type type,
-	const position2d_t& pos = { s_x, s_y }) :
-	Piece(team, type, pos.x, pos.y) 
+Piece::Piece(Type type,
+	const position2d_t& pos) :
+	Piece(type, pos.x, pos.y)
 {}
 
 bool Piece::canMove(const position2d_t& position) {
@@ -62,13 +54,4 @@ bool Pawn::canMove(const position2d_t& toPos) {
 		return (forward() || forward(2));
 	else 
 		return forward();
-}
-
-bool king_canMove(const position2d_t& atPos, const position2d_t& toPos) {
-	return (difference(atPos, toPos) == position2d_t(1, 1))
-		|| (difference(atPos, toPos) == position2d_t(0, 1))
-		|| (difference(atPos, toPos) == position2d_t(1, 0));
-}
-bool queen_canMove(const position2d_t& atPos, const position2d_t& toPos) {
-	return true;
 }

@@ -6,6 +6,11 @@
 #include <iostream>
 #include <vector>
 #include <cassert>
+#include <typeinfo>
+#include <typeindex>
+#include <unordered_map>
+#include <regex>
+#include <cctype>
 #include "vector.h"
 #include "Direction.h"
 

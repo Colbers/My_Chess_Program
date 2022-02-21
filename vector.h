@@ -1,7 +1,7 @@
 #ifndef my_Vector_H
 #define my_Vector_H
 /*
-	this is a vector header file that takes much heavy ""inspiration"" from
+	this is a vector header file that takes much "inspiration" from
 	One Lone Coder, a.k.a javidx9, creator of the OLC Pixel Game Engine;
 
 	you may see the more epic implementation of a templated mathematical vector
@@ -15,6 +15,8 @@
 	anyways, here's somewhat 'original' code:
 */
 
+#include <compare>
+
 template <class T>
 struct vector2d {
 	T x{ 0 };
@@ -23,25 +25,16 @@ struct vector2d {
 	vector2d(T _x, T _y) : x{ _x }, y{ _y }{}
 	vector2d(const vector2d& vec) : vector2d(vec.x, vec.y) {}
 
-	bool holds(const T val) { return (x == val) || (y == val); }
-
-	bool inBounds(const vector2d& vec) const { return (this->x <= vec.x) && (this->y <= vec.y); }
 	bool equalized() { return this->x == this->y; }
 
-	vector2d mod(const vector2d& vec) {
-		return  { this->x % vec.x, this->y % vec.y };
-	}
-	vector2d towards(const vector2d& vec) {
-		return	{ int(vec.x) - this->x, int(vec.y) - this->y };
-	}
 	vector2d transpose(const vector2d& vec) {
 		return { vec.y, vec.x };
 	}
 	vector2d reflect(bool bX = 1, bool bY = 1) {
-		T _x{ x }, _y{ y };
-		if (bX) _x = -x;
-		if (bY) _y = -y;
-		return { _x,_y };
+        T _x{ x }, _y{ y };
+        if (bX) _x = -x;
+        if (bY) _y = -y;
+		return { _x, _y };
 	}
 
 	const std::string str() const {
@@ -51,22 +44,15 @@ struct vector2d {
 			+ std::to_string(this->y) + ")";
 	}
 
-	inline bool operator<(const vector2d& vec) const {
-		return (this->x < vec.x) && (this->y < vec.y);
-	}
-	inline bool operator<=(const vector2d& vec) const {
-		return (this->x <= vec.x) && (this->y <= vec.y);
-	}
-
-	vector2d& operator=(const vector2d& vec) = default; 
-	vector2d operator*(const T& rhs) { return vector2d(this->x * rhs, this->y * rhs); }
-	vector2d operator+(const T& rhs) { return vector2d(this->x + rhs, this->y + rhs); }
-	vector2d& operator*=(const T& rhs) { this->x *= rhs; this->y *= rhs; return *this; }
-	vector2d operator+(const vector2d& vec) { return vector2d(this->x + vec.x, this->y + vec.y); }
-	vector2d operator-(const vector2d& vec) { return vector2d(this->x - vec.x, this->y - vec.y); }
-	vector2d operator*(const vector2d& vec) { return vector2d(this->x * vec.x, this->y * vec.y); }
-	inline bool operator==(const vector2d& vec) const { return (this->x == vec.x && this->y == vec.y); }
-	inline bool operator!=(const vector2d& vec) const { return (this->x != vec.x || this->y != vec.y); }
+    auto operator<=>(const vector2d& vec) const = default;
+    
+    vector2d& operator=(const vector2d& vec) = default;
+    vector2d operator*(const T& rhs) { return vector2d(this->x * rhs, this->y * rhs); }
+    vector2d operator+(const T& rhs) { return vector2d(this->x + rhs, this->y + rhs); }
+    vector2d& operator*=(const T& rhs) { this->x *= rhs; this->y *= rhs; return *this; }
+    vector2d operator+(const vector2d& vec) { return vector2d(this->x + vec.x, this->y + vec.y); }
+    vector2d operator-(const vector2d& vec) { return vector2d(this->x - vec.x, this->y - vec.y); }
+    vector2d operator*(const vector2d& vec) { return vector2d(this->x * vec.x, this->y * vec.y); }
 };
 typedef vector2d<int8_t>	vi8_t;
 typedef vector2d<int16_t>	vi16_t;

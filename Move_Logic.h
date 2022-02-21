@@ -47,17 +47,12 @@ struct Motion {
 
 	const position2d_t& toward{ trajectory.toward };
 
-	void operator=(Motion motion) { 
+	void operator=(const Motion& motion) {
 		this->board = motion.board;
 		this->piece = motion.piece;
 		this->trajectory = motion.trajectory;
 	}
 };
-
-template <typename T>
-vector2d<T> proceed(Motion& motion) {
-
-}
 
 struct Suppose {
 	Suppose(Motion&);

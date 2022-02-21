@@ -13,8 +13,11 @@ public:
 	Player(Team t) : pl_team{ t } {}
 		
 	Team pl_team{ Team::null };
-	Piece* crux{ nullptr };
-	piece_container pl_piece;
+    Piece* crux{ nullptr };
+    
+    void constexpr create_pieces();
+    void create_team();
+	piece_container pl_pieces;
 	piece_container pl_captured;
 };
 
