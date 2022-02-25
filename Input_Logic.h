@@ -11,6 +11,11 @@
 #include "includes.h"
 #include "Board.h"
 #include "Piece.h"
+#include "Player.h"
+
+int num_of(char ch);
+
+void create_piece(Board&, char, const pos_t&, const pos_t&);
 
 void generate_from_FEN(Board&, std::string&);
 

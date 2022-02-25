@@ -1,50 +1,50 @@
 #include "MainLoop.h"
 #include "Game.h"
 #include "Move_Logic.h"
-
-
-//void rudimentary_draw_board(Chess::Game& game) {
-//
-//	auto board_x{ game.Board().x };
-//	auto board_y{ game.Board().y };
-//
-//	for (pos_t rank{ 0 }; rank < board_y; ++rank) {
-//		for (pos_t file{ 0 }; file <= board_x; ++file) {
-//			if (file == board_x) std::cout << '\n';
-//		}
-//	}
-//}
-//
+#include "Input_Logic.h"
 
 void draw_piece(Piece* piece) {
+    
+    char p_token{};
+    char p_team{};
+    
 	switch (piece->type) {
 	case Type::king:
-		std::cout << 'K';
+		p_token = 'K';
 		break;
 
 	case Type::queen:
-		std::cout << 'Q';
+		p_token = 'Q';
 		break;
 
 	case Type::bishop:
-		std::cout << 'B';
+		p_token = 'B';
 		break;
 
 	case Type::knight:
-		std::cout << 'N';
+		p_token = 'N';
 		break;
 
 	case Type::rook:
-		std::cout << 'R';
+		p_token = 'R';
 		break;
 
 	case Type::pawn:
-		std::cout << 'P';
+		p_token = 'P';
 		break;
 
 	default:
+        p_token = '?';
 		break;
 	}
+    if (piece->team == Team::black){
+        p_team = 'b';
+        p_token = tolower(p_token);
+    }
+    else
+        p_team = 'w';
+    
+    std::cout << p_token;
 }
 
 static std::array<const char, 8> p_file{ 'a','b','c','d','e','f','g','h' };
@@ -53,7 +53,7 @@ static std::array<const char, 8> p_rank{ '1','2','3','4','5','6','7','8' };
 
 void draw_cell(const Cell* cell) {
 	if (cell->notEmpty())
-		draw_piece(cell->piece);
+		draw_piece(cell->piece.get());
 }
 
 std::ostream& operator<<(std::ostream& out, std::array<const char, 8>& arr) {
@@ -64,25 +64,39 @@ std::ostream& operator<<(std::ostream& out, std::array<const char, 8>& arr) {
 
 void draw_north(Board& board) {
 
+    // variables for readability
+    
 	auto board_w{ board.size.x };
 	auto board_h{ board.size.y };
 
 
 	for (pos_t r{ 0 }; r < board_h; ++r) {
 		for (pos_t f{ 0 }; f < board_w; ++f) {
-			pos_t _r = (board_h - 1) - r;
+                // we start drawing from the top, 8th rank.
+               // to "climb down" we subtract
+              // our index from the max, also
+             // reduce index by one since arrays
+            // start at 0, rather than 1
+            
+			pos_t _r = (board_h - r) - 1;
 
-			if (f == 0) std::cout << p_rank[_r];
+            // print the rank number at the start of row
+            if (f == 0) std::cout << p_rank[_r];
 
-			if (board.position(f, _r)->isEmpty())
+            // draw piece or '*' if empty
+			if (board.cell_position(f, _r)->isEmpty())
 				std::cout << '*';
 			else
-				draw_cell(board.position(f,_r));
+				draw_cell(board.cell_position(f,_r));
 
-			if (f == board_w - 1)
+            // end of line, new line
+            if (f == board_w - 1)
 				std::cout << '\n';
 		}
 	}
+      // space is added to account for the fact
+     // that each row is one longer,
+    // because each row prints its number + the row
 	std::cout << ' ' << p_file << '\n';
 }
 
@@ -127,13 +141,15 @@ void Chess::Run() {
 	bool quit{ false };
 
 	Board board;
+    
+    std::string FEN{
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
+    };
 
 	while (!quit) {
-
-		draw_board(board);
         
-        std::cout << "sizeof(Traditional_Set): " <<
-        sizeof(position2d_t) << '\n';
+        generate_from_FEN(board, FEN);
+		draw_board(board);
         
 		quit = true;
 		std::cout << "\nquit = true;\n";

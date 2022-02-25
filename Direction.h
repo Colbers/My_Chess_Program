@@ -61,7 +61,7 @@ Direction create_direction(const vector2d<T>& og, const vector2d<T>& to) {
 	else if (X < 0)
 		face = (Y > 0) ? cardinal::northwest : cardinal::southwest;
 
-	return Direction(face);
+	return face;
 }
 
 template <typename T>
@@ -103,70 +103,5 @@ vector2d<T> proceed(vector2d<T> pos, Direction dir, uint32_t n = 1) {
 		return pos;
 	}
 }
-
-//template<typename T>
-//Direction<T>::Direction(const vector2d<T>& origin, const vector2d<T>& toward) {
-//	int32_t X{ int32_t(toward.x) - origin.x };
-//	int32_t Y{ int32_t(toward.y) - origin.y };
-//
-//	if (!X && !Y) facing = cardinal::null;
-//
-//	else if (X == 0) 
-//		facing = (Y > 0) ? cardinal::north : cardinal::south;
-//
-//	else if (Y == 0)
-//		facing = (X > 0) ? cardinal::east : cardinal::west;
-//
-//	else if (X > 0)
-//		facing = (Y > 0) ? cardinal::northeast : cardinal::southeast;
-//
-//	else if (X < 0)
-//		facing = (Y > 0) ? cardinal::northwest : cardinal::southwest;
-//}
-
-//template<typename T>
-//vector2d<T> Direction<T>::proceed(vector2d<T> pos, uint32_t n) { //'proceed' in the direction of facing
-//	switch (facing) {
-//	case cardinal::north:
-//		return North(pos, n);
-//		break;
-//
-//	case cardinal::south:
-//		return South(pos, n);
-//		break;
-//
-//	case cardinal::east:
-//		return East(pos, n);
-//		break;
-//
-//	case cardinal::west:
-//		return West(pos,n);
-//		break;
-//
-//	case cardinal::northeast:
-//		return North(East(pos, n), n);
-//		break;
-//
-//	case cardinal::northwest:
-//		return North(West(pos, n), n);
-//		break;
-//
-//	case cardinal::southeast:
-//		return South(East(pos, n), n);
-//		break;
-//
-//	case cardinal::southwest:
-//		return South(West(pos, n), n);
-//		break;
-//
-//	default:
-//		return pos;
-//	}
-//}
-//
-//template <typename T>
-//vector2d<T> Direction<T>::proceed(vector2d<T> vec) {
-//	return proceed(vec, 1);
-//}
 
 #endif

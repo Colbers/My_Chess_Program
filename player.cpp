@@ -20,12 +20,9 @@ void constexpr Player::create_pieces() {
     for (auto x{0}; x < 8; ++x)
         pl_pieces.emplace_back(new Pawn(x, fr));
     
-}
-
-void Player::create_team(){
-    for (auto& piece : pl_pieces)
+ // assign player's team to each piece
+    for(auto& piece : pl_pieces)
         piece->set_team(pl_team);
+    
 }
-
-
 

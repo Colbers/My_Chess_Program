@@ -14,26 +14,37 @@ enum class Type { null = 0, king, queen, bishop, knight, rook, pawn };
 class Piece {
 public:
 	Piece() = default;
+    Piece(Type, Team, const pos_t& x, const pos_t& y);
 	Piece(Type, const pos_t& x, const pos_t& y);
 	Piece(Type, const position2d_t&);
     Piece(Type);
 
+            /* various checks */
+    /*
+     Dev Philosophy:
+        I decided that Pieces should generally be aware
+        of how they may technically move, the idea
+        being that validaters query the piece to move
+     */
+    
 	bool initial_position() const { return initPos; }
 	void has_moved() { initPos = false; }
 	virtual bool canMove(const position2d_t& position);
     virtual	bool canMove(const pos_t x, const pos_t y) {
         return canMove({x, y});
     }
-	const position2d_t& origin() const { return atPos; }
 
 	position2d_t& get_pos() { return atPos; }
-	void set_team(Team t) { p_team = t; }
-	friend const position2d_t position(Piece*);
+    void set_team(Team t) { p_team = t; }
 
-	const position2d_t& pos{ atPos };
-	const Type& type{ p_type };
+    friend const position2d_t position_of(Piece*);
+
+            /* const references */
+    const position2d_t& pos{ atPos };
+    const Type& type{ p_type };
 	const Team& team{ p_team };
-
+        
+            /* the innate properties of a Piece */
 protected:
 	position2d_t atPos{};
 	cardinal facing{ cardinal::null };
@@ -42,10 +53,12 @@ protected:
 	bool initPos{ true };
 };
 
-inline const position2d_t position(Piece* piece) { return piece->atPos; }
+ // simple utility function to (loudly)
+// grab the position of a piece
 
-using piece_container = std::vector<std::unique_ptr<Piece>>;
+inline const position2d_t position_of(Piece* piece) { return piece->atPos; }
 
+        /* each Piece type is its own class */
 class King : public Piece {
 public:
 	King(const pos_t& pos_x, const pos_t& pos_y) :
@@ -168,26 +181,6 @@ public:
 	bool canMove(const pos_t x, const pos_t y) {
         return canMove({x, y});
     }
-};
-
-class Traditional_Set{
-    King king;
-    Queen queen;
-    std::array<Bishop, 2> bishops;
-    std::array<Knight, 2> knights;
-    std::array<Rook, 2> rooks;
-    std::array<Pawn, 8> pawns;
-    
-    friend class Player;
-};
-
-class Trad_set{
-    int kings{1};
-    int queens{1};
-    int bishop{2};
-    int knight{2};
-    int rooks{2};
-    int pawns{8};
 };
 
 #endif

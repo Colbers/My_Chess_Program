@@ -11,14 +11,10 @@ Board::Board(pos_t size_w, pos_t size_h) :
 	}
 }
 
-Cell* Board::position(const pos_t& pos_x, const pos_t& pos_y) {
+Cell* Board::cell_position(const pos_t& pos_x, const pos_t& pos_y) {
 	return &b_space[pos_y * size.x + pos_x];
 }
 
-Cell* Board::position(const position2d_t& pos) {
-	return position(pos.x, pos.y);
+Cell* Board::cell_position(const position2d_t& pos) {
+	return cell_position(pos.x, pos.y);
 }
-
-//Cell* Board::position(const char file, const char rank) {
-//	return position(file, rank);
-//}

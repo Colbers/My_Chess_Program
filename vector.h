@@ -30,6 +30,7 @@ struct vector2d {
 	vector2d transpose(const vector2d& vec) {
 		return { vec.y, vec.x };
 	}
+    
 	vector2d reflect(bool bX = 1, bool bY = 1) {
         T _x{ x }, _y{ y };
         if (bX) _x = -x;

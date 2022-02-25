@@ -18,7 +18,7 @@ struct Trajectory {
 		} 
 	{}
 
-	Trajectory(position2d_t _origin, direction _direction) :
+	Trajectory(position2d_t _origin, direction _direction = cardinal::null) :
 		origin{ _origin }, 
 		direction { _direction } {}
 
@@ -38,7 +38,7 @@ struct Motion {
 	Motion(Board* _board, Piece* _piece, const position2d_t& _pos) :
 		board{ _board },
 		piece { _piece },
-		trajectory{ _piece->origin(), _pos }
+		trajectory{ _piece->pos, _pos }
 	{}
 
 	Board* board{ nullptr };

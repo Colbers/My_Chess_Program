@@ -16,9 +16,9 @@ public:
     Piece* crux{ nullptr };
     
     void constexpr create_pieces();
-    void create_team();
-	piece_container pl_pieces;
-	piece_container pl_captured;
+    void constexpr assimilate_pieces(const Board&);
+	std::vector<std::shared_ptr<Piece>> pl_pieces;
+	std::vector<Piece*> pl_captured;
 };
 
 #endif // !PLAYER_H
