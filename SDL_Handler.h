@@ -4,6 +4,8 @@
 #include "includes.h"
 #include <SDL.h>
 
-class SDL_Handler;
+class SDL_Interface{
+    SDL_Interface();
+};
 
 #endif

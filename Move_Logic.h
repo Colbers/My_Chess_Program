@@ -35,7 +35,7 @@ struct Motion {
 		piece{ _piece }
 	{}
 
-	Motion(Board* _board, Piece* _piece, const position2d_t& _pos) :
+	Motion(Board* _board, Piece* _piece, position2d_t const& _pos) :
 		board{ _board },
 		piece { _piece },
 		trajectory{ _piece->pos, _pos }
@@ -45,7 +45,8 @@ struct Motion {
 	Piece* piece{ nullptr };
 	Trajectory trajectory{};
 
-	const position2d_t& toward{ trajectory.toward };
+    position2d_t const& origin{ trajectory.origin };
+	position2d_t const& toward{ trajectory.toward };
 
 	void operator=(const Motion& motion) {
 		this->board = motion.board;

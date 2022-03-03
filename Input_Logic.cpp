@@ -7,8 +7,14 @@
 
 #include "Input_Logic.h"
 
-int num_of(char ch){ // utility function for readability
-    return ch - '0';
+constexpr int num_of(char ch){ // utility function for readability
+    return int(ch - '0');
+}
+constexpr pos_t to_file(char ch){
+    return pos_t(ch - 'a');
+}
+constexpr pos_t to_rank(char ch){
+    return pos_t(num_of(ch));
 }
 
 void constexpr Player::assimilate_pieces(const Board& board){
@@ -22,14 +28,14 @@ void constexpr Player::assimilate_pieces(const Board& board){
 
 
 void create_piece(Board& board, char ch,
-                  const pos_t& x, const pos_t& y)
+                  pos_t const& x, pos_t const& y)
 {
-    // pose a dynamic pointer with shared ownership
+    // create a pointer referring to a shared dynamic object
     
     std::shared_ptr<Piece> mystery_piece;
     
     // if our input is valid,
-    // the mystery piece should be substantiated
+    // mystery_piece should be substantiated
     
     switch (ch){ // to avoid repeat lines of code,
                 // we'll set the team later
@@ -72,7 +78,10 @@ void create_piece(Board& board, char ch,
         else
             mystery_piece->set_team(Team::black);
         
-        board.cell_position(x,y)->piece = std::move(mystery_piece);
+          // move mystery_piece
+         // from current scope,
+        // to board scope
+        board.get_cell_at(x,y).piece = std::move(mystery_piece);
     }
 }
 
@@ -82,21 +91,31 @@ void generate_from_FEN(Board& board, std::string& FEN) {
     int rank{ 7 }; // climb down from the top of the board
     
     for (auto ch : FEN){
-        if (isalpha(ch)){ // create the piece based on character input
+        
+        if (isalpha(ch))
+        { // create the piece based on character input
             create_piece(board, ch, file, rank);
             ++file; // we probably put a piece down, go to next in line
+        } else
+            
+        if (isnumber(ch)
+        && (num_of(ch) + file) < 8)
+        {
+          // we don't want to overflow our row,
+         // there are only 8 squares after all...
+        // skip X spaces for X input
+            file += num_of(ch);
+        } else
+            
+        if (ch == '/')
+        {               // FEN column break,
+            --rank;    // go down a row
+            file = 0; // reset to first of row,
+                     // like a type writer
         }
-        else
-            if (isnumber(ch)
-                && (num_of(ch) + file) < 8) // we don't want to overflow our row,
-                                           // there are only 8 rows after all...
-                file += num_of(ch); // skip X spaces for X input
-        else
-            if (ch == '/'){ // FEN column break, go down a row
-                --rank;
-                
-                file = 0; // make sure we reset to the start of row
-                         // like a type writer
-            }
     }
+}
+
+void Make_Move(Board& board, Piece* piece, const char x, const char y, Piece* crux){
+
 }

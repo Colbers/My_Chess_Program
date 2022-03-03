@@ -5,8 +5,8 @@
 #include "vector.h"
 #include "Direction.h"
 
-inline pos_t file(const position2d_t& pPos) { return pPos.x; }
-inline pos_t rank(const position2d_t& pPos) { return pPos.y; }
+inline pos_t file(position2d_t const& pPos) { return pPos.x; }
+inline pos_t rank(position2d_t const& pPos) { return pPos.y; }
 
 enum class Team { null = 0, white = 1, black = 2 };
 enum class Type { null = 0, king, queen, bishop, knight, rook, pawn };
@@ -14,12 +14,10 @@ enum class Type { null = 0, king, queen, bishop, knight, rook, pawn };
 class Piece {
 public:
 	Piece() = default;
-    Piece(Type, Team, const pos_t& x, const pos_t& y);
-	Piece(Type, const pos_t& x, const pos_t& y);
-	Piece(Type, const position2d_t&);
-    Piece(Type);
+    Piece(Team, pos_t const& x, pos_t const& y);
+	Piece(pos_t const& x, pos_t const& y);
+	Piece(position2d_t const&);
 
-            /* various checks */
     /*
      Dev Philosophy:
         I decided that Pieces should generally be aware
@@ -27,27 +25,28 @@ public:
         being that validaters query the piece to move
      */
     
+            /* various checks */
+    
 	bool initial_position() const { return initPos; }
-	void has_moved() { initPos = false; }
-	virtual bool canMove(const position2d_t& position);
-    virtual	bool canMove(const pos_t x, const pos_t y) {
+    virtual bool canMove(position2d_t const& position);
+    virtual bool canMove(const pos_t x, const pos_t y) {
         return canMove({x, y});
     }
 
-	position2d_t& get_pos() { return atPos; }
+    position2d_t& get_pos() { return atPos; }
     void set_team(Team t) { p_team = t; }
-
-    friend const position2d_t position_of(Piece*);
+    void set_direction(cardinal dir) { facing = dir; }
+    void has_moved() { initPos = false; }
 
             /* const references */
-    const position2d_t& pos{ atPos };
-    const Type& type{ p_type };
-	const Team& team{ p_team };
+    position2d_t const& pos{ atPos };
+    Type const& type{ p_type };
+	Team const& team{ p_team };
         
             /* the innate properties of a Piece */
 protected:
 	position2d_t atPos{};
-	cardinal facing{ cardinal::null };
+	Direction facing{ cardinal::null };
 	Team p_team{ Team::null };
 	Type p_type{ Type::null };
 	bool initPos{ true };
@@ -55,25 +54,20 @@ protected:
 
  // simple utility function to (loudly)
 // grab the position of a piece
-
-inline const position2d_t position_of(Piece* piece) { return piece->atPos; }
+inline position2d_t const& position_of(Piece* piece) { return piece->pos; }
 
         /* each Piece type is its own class */
 class King : public Piece {
 public:
-	King(const pos_t& pos_x, const pos_t& pos_y) :
-		Piece(Type::king, pos_x, pos_y)
-	{}
+	King(pos_t const& pos_x, pos_t const& pos_y) :
+        Piece(pos_x, pos_y) { p_type = Type::king; }
 
-	King(const position2d_t& pos) :
-		King(pos.x, pos.y)
-	{}
+	King(position2d_t const& pos) :
+        King(pos.x, pos.y) {}
     
-    King() :
-        Piece(Type::king)
-    {}
+    King() { p_type = Type::king; }
 
-	bool canMove(const position2d_t&);
+	bool canMove(position2d_t const&);
 	bool canMove(const pos_t x, const pos_t y) {
         return canMove({x, y});
     }
@@ -81,19 +75,15 @@ public:
 
 class Queen : public Piece {
 public:
-	Queen(const pos_t& pos_x, const pos_t& pos_y) :
-		Piece(Type::queen, pos_x, pos_y)
-	{}
+	Queen(pos_t const& pos_x, pos_t const& pos_y) :
+        Piece(pos_x, pos_y) { p_type = Type::queen; }
 
-	Queen(const position2d_t& pos) :
-		Queen(pos.x, pos.y)
-	{}
+	Queen(position2d_t const& pos) :
+		Queen(pos.x, pos.y) {}
     
-    Queen() :
-        Piece(Type::queen)
-    {}
+    Queen() { p_type = Type::queen; }
 
-	bool canMove(const position2d_t&);
+	bool canMove(position2d_t const&);
 	bool canMove(const pos_t x, const pos_t y) {
         return canMove({x, y});
     }
@@ -101,19 +91,15 @@ public:
 
 class Bishop : public Piece {
 public:
-	Bishop(const pos_t& pos_x, const pos_t& pos_y) :
-		Piece(Type::bishop, pos_x, pos_y)
-	{}
+	Bishop(pos_t const& pos_x, pos_t const& pos_y) :
+        Piece(pos_x, pos_y) { p_type = Type::bishop; }
 
-	Bishop(const position2d_t& pos) :
-		Bishop(pos.x, pos.y)
-	{}
+	Bishop(position2d_t const& pos) :
+		Bishop(pos.x, pos.y) {}
     
-    Bishop() :
-        Piece(Type::bishop)
-    {}
+    Bishop() { p_type = Type::bishop; }
 
-	bool canMove(const position2d_t&);
+	bool canMove(position2d_t const&);
 	bool canMove(const pos_t x, const pos_t y) {
         return canMove({x, y});
     }
@@ -121,19 +107,15 @@ public:
 
 class Knight : public Piece {
 public:
-	Knight(const pos_t& pos_x, const pos_t& pos_y) :
-		Piece(Type::knight, pos_x, pos_y)
-	{}
+	Knight(pos_t const& pos_x, pos_t const& pos_y) :
+        Piece(pos_x, pos_y) { p_type = Type::knight; }
 
-	Knight(const position2d_t& pos) :
-		Knight(pos.x, pos.y)
-	{}
+	Knight(position2d_t const& pos) :
+		Knight(pos.x, pos.y) {}
     
-    Knight():
-        Piece(Type::knight)
-    {}
+    Knight() { p_type = Type::knight; }
 
-	bool canMove(const position2d_t&);
+	bool canMove(position2d_t const&);
 	bool canMove(const pos_t x, const pos_t y) {
         return canMove({x, y});
     }
@@ -141,19 +123,15 @@ public:
 
 class Rook : public Piece {
 public:
-	Rook(const pos_t& pos_x, const pos_t& pos_y) :
-		Piece(Type::rook, pos_x, pos_y)
-	{}
+	Rook(pos_t const& pos_x, pos_t const& pos_y) :
+        Piece(pos_x, pos_y) { p_type = Type::rook; }
 
-	Rook(const position2d_t& pos) :
-		Rook(pos.x, pos.y)
-	{}
+	Rook(position2d_t const& pos) :
+		Rook(pos.x, pos.y) {}
     
-    Rook() :
-        Piece(Type::rook)
-    {}
+    Rook() { p_type = Type::rook; }
 	
-	bool canMove(const position2d_t&);
+	bool canMove(position2d_t const&);
 	bool canMove(const pos_t x, const pos_t y) {
         return canMove({x, y});
     }
@@ -161,26 +139,33 @@ public:
 
 class Pawn : public Piece {
 public:
-	Pawn(const pos_t& pos_x, const pos_t& pos_y, const direction& _face) :
-		Piece(Type::pawn, pos_x, pos_y)
-    {}
+	Pawn(pos_t const& pos_x, pos_t const& pos_y) :
+        Piece(pos_x, pos_y) { p_type = Type::pawn; }
 
-	Pawn(const position2d_t& pos, const direction& _face) :
-		Pawn(pos.x, pos.y, _face)
-	{}
+	Pawn(position2d_t const& pos) :
+		Pawn(pos.x, pos.y) {}
     
-    Pawn(const pos_t& _x, const pos_t& _y) :
-        Piece(Type::pawn, _x, _y)
-    {}
-    
-    Pawn() :
-        Piece(Type::pawn)
-    {}
+    Pawn() { p_type = Type::pawn; }
 
-	bool canMove(const position2d_t&);
+	bool canMove(position2d_t const&);
 	bool canMove(const pos_t x, const pos_t y) {
         return canMove({x, y});
     }
 };
+
+class Player;
+
+namespace alt {
+class King {
+public:
+    King(pos_t const& x, pos_t const& y) :
+        pos{ x, y } {}
+    
+    position2d_t pos;
+    Type type{ Type::king };
+    bool canMove(pos_t const& x, pos_t const& y);
+};
+
+}
 
 #endif

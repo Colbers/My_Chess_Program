@@ -50,9 +50,9 @@ static std::array<const char, 8> p_file{ 'a','b','c','d','e','f','g','h' };
 static std::array<const char, 8> p_rank{ '1','2','3','4','5','6','7','8' };
 
 
-void draw_cell(const Cell* cell) {
-	if (cell->notEmpty())
-		draw_piece(cell->piece.get());
+void draw_cell(Cell const& cell) {
+	if (cell.notEmpty())
+		draw_piece(cell.piece.get());
 }
 
 std::ostream& operator<<(std::ostream& out, std::array<const char, 8>& arr) {
@@ -83,7 +83,7 @@ void draw_north(Board& board) {
             if (f == 0) std::cout << p_rank[_r];
 
             // draw piece or '*' if empty
-			if (board.cell_position(f, _r)->isEmpty())
+			if (board.cell_position(f, _r).isEmpty())
 				std::cout << '*';
 			else
 				draw_cell(board.cell_position(f,_r));
@@ -135,6 +135,30 @@ void draw_board(Board& board, cardinal facing = cardinal::north) {
 	}
 }
 
+class Game{
+public:
+    Game() : pl_turn{ Team::white }{
+        players.push_back(Player(Team::white));
+        players.push_back(Player(Team::black));
+    }
+    void next_turn(){
+        pl_turn =
+        (pl_turn == Team::white) ?
+        Team::black : Team::white;
+    }
+    Board board;
+    std::vector<Player> players;
+    Team pl_turn;
+};
+
+bool Player::my_turn(Game& game){
+    return pl_team == game.pl_turn;
+}
+
+void print_size(const char* object){
+
+}
+
 void Chess::Run() {
 
 	bool quit{ false };
@@ -142,13 +166,15 @@ void Chess::Run() {
 	Board board;
     
     std::string FEN{
-        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
+        "rnbkqbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBKQBNR"
     };
 
 	while (!quit) {
         
         generate_from_FEN(board, FEN);
 		draw_board(board);
+
+        
         
 		quit = true;
 		std::cout << "\nquit = true;\n";

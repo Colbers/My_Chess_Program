@@ -1,9 +1,5 @@
 #include "Move_Logic.h"
 
-Cell* Board::cell_position(const Piece* piece) {
-	return cell_position(piece->pos);
-}
-
       // this function iterates from a starting point,
      // returning one of these options:
     //
@@ -11,7 +7,7 @@ Cell* Board::cell_position(const Piece* piece) {
   // a cell at the edge of board
  // a cell holding first piece found during iteration
 //
-Cell* iter_thru_cell(Board* board, Trajectory traj){
+Cell& iter_thru_cell(Board* board, Trajectory traj) {
 
 	auto current{ traj.origin };
 	auto direction{ traj.direction };
@@ -23,30 +19,38 @@ Cell* iter_thru_cell(Board* board, Trajectory traj){
 		current = proceed(current, direction);
 
 		arrive = current == traj.toward;
-		occupied = board->cell_position(current)->notEmpty();
+		occupied = board->cell_position(current).notEmpty();
 
 		if (arrive || occupied) break;
 	}
 
-	return board->cell_position(current);
+	return board->get_cell_at(current);
 }
 
-Cell* iter_thru_cell(Motion& motion) {
+Cell const& iter_thru_cell(Motion& motion) {
 	return iter_thru_cell(motion.board, motion.trajectory);
 }
 
+        /* The fabled Move function */
+
 void Move(Motion& motion) { //self-explanatory
 
-	Cell* origin{ motion.board->cell_position(motion.piece) };
-	Cell* destination{ motion.board->cell_position(motion.toward) };
+    // where we start
+	auto& origin{ motion.board->get_cell_at(motion.piece->pos) };
+	// where we go
+    auto& destination{ motion.board->get_cell_at(motion.toward) };
     
-    auto motion_piece{ motion.board->get_sharedPiece(motion.piece)};
+       // we require a reference to the shared_ptr object
+      // to simplify memory relocation
+     // using the std::move()
+    // called by Cell::nowHolds(Piece*)
+    auto motion_piece{ motion.board->get_sharedPiece(motion.piece->pos)};
 
-	if (destination->isEmpty()) { //only move there if vacant space,
+	if (destination.isEmpty()) { // only move there if vacant space,
 
-		origin->release(); //piece has left home
-		destination->nowHolds(motion_piece);  //piece found new home
-		motion.piece->get_pos() = motion.toward;  //update the position
+		origin.release();
+		destination.nowHolds(motion_piece);  // piece found new home
+		motion.piece->get_pos() = motion.toward;  // update the position
 	}
 }
 
@@ -54,19 +58,19 @@ Suppose::Suppose(Motion& _motion) : // hypothetical move
 	ogPos{ position_of(_motion.piece) }, // remember where we start
 	motion{ _motion } // motion in question
 {
-	Cell* target_cell = { motion.board->cell_position(motion.trajectory.toward) };
+	Cell& target_cell = { motion.board->get_cell_at(motion.toward) };
 
-	if (target_cell->notEmpty()
-		&& (target_cell->piece->team != motion.piece->team)) {
+	if (target_cell.notEmpty()
+		&& (target_cell.piece->team != motion.piece->team)) {
 
 		obstacle = { motion.board,
-                     target_cell->piece.get(),
-                     position_of(target_cell->piece.get()) };
+                     target_cell.piece.get(),
+                     position_of(target_cell.piece.get()) };
 
-		target_cell->release();
+		target_cell.release();
 		Move(motion);
 	}
-	else if (target_cell->isEmpty()) {
+	else if (target_cell.isEmpty()) {
 		Move(motion);
 	}
 }
@@ -83,25 +87,25 @@ bool check_safe(Motion& motion, Piece* crux) {
     
     /* lambdas for sake of readability */
 					
-	auto position = [&motion](const position2d_t& pos) {
+	auto position = [&motion](position2d_t const& pos) {
 		return motion.board->cell_position(pos);
 	};
 
-	auto proceed = [&](const position2d_t& pos, int n=1) {
+	auto proceed = [&](position2d_t const& pos, int n=1) {
 		return ::proceed(pos, motion.trajectory.direction, n);
 	};
 
-	auto check = [&](int _dir) { 
+	auto check = [&](int _dir) {
 		return iter_thru_cell(motion.board, { crux->pos, cardinal(_dir) });
 	};
 
-	auto danger_piece = [&crux](Cell* cell) {
+	auto danger_piece = [&crux](Cell const& cell) {
           // if piece can move to king's position
          // AND piece is not same team,
         // piece is evil and danger
         
-		return (cell->piece->team != crux->team)
-             && cell->piece->canMove(crux->pos);
+		return (cell.piece->team != crux->team)
+             && cell.piece->canMove(crux->pos);
          // check team first; we dont care if teammates
         // can fill the king's spot, early judgement
 	};
@@ -174,20 +178,55 @@ bool check_safe(Motion& motion, Piece* crux) {
 	return true;
 }
 
+bool mayCastle(Motion& motion){
+    if (( file(motion.origin) != file(motion.toward ))
+       || difference(motion.origin, motion.toward) == position2d_t{1,0})
+        return false;
+    
+    Cell const& target_side = {
+        iter_thru_cell(motion)
+    };
+    
+    bool initial_positions = {
+        motion.piece->initial_position()
+        && target_side.piece->initial_position()
+    };
+    
+    bool rook {
+        target_side.piece->type == Type::rook
+    };
+    
+    return (rook && initial_positions);
+}
+
+bool Technical_Move(Motion& motion){
+    bool default_move{
+        motion.piece->canMove(motion.toward)
+    };
+    
+    switch (motion.piece->type){
+        case Type::king:
+            return mayCastle(motion)
+                || default_move;
+        default:
+            return default_move;
+    }
+}
+
 bool Legal_Move(Motion& motion, Piece* crux) {
 
     // check 'toward' is in bounds of the board
 	if (!(motion.toward <= motion.board->size)
 
-    // check that 'piece' may reach 'toward'
-	  || !motion.piece->canMove(motion.toward)
+    // check if our move is a special case
+	  || !Technical_Move(motion)
 
     // check if move is safe
 	  || !check_safe(motion, crux))
 			return false;
 
-	Cell* target_cell { motion.board->cell_position(motion.toward) };
-	Piece* found_piece { target_cell->piece.get() };
+	Cell const& target_cell { motion.board->cell_position(motion.toward) };
+	Piece* found_piece { target_cell.piece.get() };
 
 	bool friendly { // if we found a piece, check allegiance;
                    // otherwise, an empty cell is a friendly cell
@@ -198,14 +237,14 @@ bool Legal_Move(Motion& motion, Piece* crux) {
 		return !found_piece || !friendly;	 //knight just jump
 	}
 	else {
-		Cell* destination = { iter_thru_cell(motion) };
+		Cell const& destination = { iter_thru_cell(motion) };
 
-		found_piece = destination->piece.get();
+		found_piece = destination.piece.get();
 
 		friendly = found_piece ? (found_piece->team == motion.piece->team) : true;
 
-		if (destination->isEmpty())	// iter_thru_cell() found the path empty
-			return target_cell == destination;  // a sanity check
+		if (destination.isEmpty())	// iter_thru_cell() found the path empty
+			return &target_cell == &destination;  // a sanity check
 		else 
 			if (found_piece && 
 				found_piece->pos == motion.toward)
@@ -216,3 +255,4 @@ bool Legal_Move(Motion& motion, Piece* crux) {
 				  // it should fall through loops
 				 // we dont capture friends
 }
+

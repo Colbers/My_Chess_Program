@@ -4,6 +4,7 @@
 #include "Piece.h"
 
 struct Board;
+class Game;
 
 static int p_id{ 0x0 };
 
@@ -15,6 +16,7 @@ public:
 	Team pl_team{ Team::null };
     Piece* crux{ nullptr };
     
+    bool my_turn(Game&);
     void constexpr create_pieces();
     void constexpr assimilate_pieces(const Board&);
 	std::vector<std::shared_ptr<Piece>> pl_pieces;

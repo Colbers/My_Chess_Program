@@ -10,11 +10,3 @@ Board::Board(pos_t size_w, pos_t size_h) :
 		b_space.push_back(Cell());
 	}
 }
-
-Cell* Board::cell_position(const pos_t& pos_x, const pos_t& pos_y) {
-	return &b_space[pos_y * size.x + pos_x];
-}
-
-Cell* Board::cell_position(const position2d_t& pos) {
-	return cell_position(pos.x, pos.y);
-}

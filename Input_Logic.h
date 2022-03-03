@@ -9,14 +9,15 @@
 #define Input_Logic_h
 
 #include "includes.h"
-#include "Board.h"
-#include "Piece.h"
+#include "Move_Logic.h"
 #include "Player.h"
 
-int num_of(char ch);
+constexpr int num_of(char ch);
 
-void create_piece(Board&, char, const pos_t&, const pos_t&);
+void create_piece(Board&, char, pos_t const&, pos_t const&);
 
 void generate_from_FEN(Board&, std::string&);
+
+std::string get_input();
 
 #endif /* Input_Logic_h */

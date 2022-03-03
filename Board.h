@@ -15,7 +15,7 @@ struct Cell {
 	bool isEmpty() const { return !piece; }
 	bool notEmpty() const { return !isEmpty(); }
 	void nowHolds(std::shared_ptr<Piece>& _piece) { piece = std::move(_piece); }
-	void release() { piece = nullptr; }
+	constexpr void release() { piece.reset(); }
 };
 
 struct Board {
@@ -23,13 +23,23 @@ struct Board {
 	Board(position2d_t& vec);
 	Board(pos_t size_w, pos_t size_h);
 
-	Cell* cell_position(const pos_t&, const pos_t&);
-	Cell* cell_position(const char file, const char rank);
-	Cell* cell_position(const position2d_t&);
-	Cell* cell_position(const Piece*);
     
-    std::shared_ptr<Piece>& get_sharedPiece(const Piece* piece){
-        return cell_position(piece)->piece;
+    constexpr Cell const& cell_position(pos_t const& x, pos_t const& y) const {
+        return b_space[y * size.x + x];
+    }
+    constexpr Cell const& cell_position(position2d_t const& pos) const {
+        return cell_position(pos.x, pos.y);
+    }
+   
+    constexpr Cell& get_cell_at(pos_t const&x, pos_t const& y){
+        return b_space[y * size.x + x];
+    }
+    constexpr Cell& get_cell_at(position2d_t const& pos) {
+        return get_cell_at(pos.x, pos.y);
+    }
+    
+    constexpr std::shared_ptr<Piece>& get_sharedPiece(position2d_t const& pos) {
+        return get_cell_at(pos).piece;
     }
 
 	const position2d_t size;
