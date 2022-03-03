@@ -2,78 +2,108 @@
 #define PIECE_H
 
 #include "includes.h"
-#include "vector.h"
-#include "Direction.h"
 
-inline pos_t file(const position2d_t& pPos) { return pPos.x; }
-inline pos_t rank(const position2d_t& pPos) { return pPos.y; }
+inline pos_t file(pos2d_t const& pPos) { return pPos.x; }
+inline pos_t rank(pos2d_t const& pPos) { return pPos.y; }
 
 enum class Team { null = 0, white = 1, black = 2 };
 enum class Type { null = 0, king, queen, bishop, knight, rook, pawn };
 
+inline std::ostream& operator<<(std::ostream& out, Team t) {
+    const char* team{};
+    switch (t) {
+    case Team::white: team = "white";
+        break;
+    case Team::black: team = "black";
+        break;
+    default: team = "???";
+    }
+    out << team;
+    return out;
+}
+
+namespace sprite {
+    inline vi32_t king     { 7, 0 };
+    inline vi32_t queen    { 6, 0 };
+    inline vi32_t bishop   { 5, 0 };
+    inline vi32_t knight   { 4, 0 };
+    inline vi32_t rook     { 3, 0 };
+    inline vi32_t pawn     { 2, 0 };
+}
+
 class Piece {
 public:
 	Piece() = default;
-    Piece(Type, Team, const pos_t& x, const pos_t& y);
-	Piece(Type, const pos_t& x, const pos_t& y);
-	Piece(Type, const position2d_t&);
-    Piece(Type);
+	Piece(pos_t const& x, pos_t const& y);
+	Piece(pos2d_t const&);
 
-            /* various checks */
     /*
      Dev Philosophy:
-        I decided that Pieces should generally be aware
-        of how they may technically move, the idea
-        being that validaters query the piece to move
-     */
+        I decided that Pieces should generally calculate
+        the math of the move, the idea
+        being that we validate the move using logic
+    */
+    
+            /* various checks */
     
 	bool initial_position() const { return initPos; }
-	void has_moved() { initPos = false; }
-	virtual bool canMove(const position2d_t& position);
-    virtual	bool canMove(const pos_t x, const pos_t y) {
+    virtual bool canMove(pos2d_t const& position);
+    virtual bool canMove(const pos_t x, const pos_t y) {
         return canMove({x, y});
     }
 
-	position2d_t& get_pos() { return atPos; }
+    pos2d_t& get_pos() { return atPos; }
     void set_team(Team t) { p_team = t; }
-
-    friend const position2d_t position_of(Piece*);
+    void set_direction(cardinal dir) { facing = dir; }
+    vi32_t& get_sprite_pos() { return spr_pos; }
+    void has_moved() { initPos = false; }
 
             /* const references */
-    const position2d_t& pos{ atPos };
-    const Type& type{ p_type };
-	const Team& team{ p_team };
+    pos2d_t const& pos{ atPos };
+    Type const& type{ p_type };
+	Team const& team{ p_team };
+    char const& note{ p_token };
+    vi32_t const& sprite_locale{ spr_pos };
         
             /* the innate properties of a Piece */
 protected:
-	position2d_t atPos{};
-	cardinal facing{ cardinal::null };
+
+    char p_token{ '?' };
+    vi32_t spr_pos{};
+
+	pos2d_t atPos{};
+	Direction facing{ cardinal::null };
 	Team p_team{ Team::null };
 	Type p_type{ Type::null };
 	bool initPos{ true };
 };
 
+using piece_ptr = std::shared_ptr<Piece>;
+
  // simple utility function to (loudly)
 // grab the position of a piece
-
-inline const position2d_t position_of(Piece* piece) { return piece->atPos; }
+inline pos2d_t const& position_of(Piece* piece) { return piece->pos; }
 
         /* each Piece type is its own class */
 class King : public Piece {
 public:
-	King(const pos_t& pos_x, const pos_t& pos_y) :
-		Piece(Type::king, pos_x, pos_y)
-	{}
+	King(pos_t const& x, pos_t const& y) :
+        King()
+    {
+        atPos = { x,y };
+    }
 
-	King(const position2d_t& pos) :
-		King(pos.x, pos.y)
-	{}
+	King(pos2d_t const& pos) :
+        King(pos.x, pos.y) {}
     
-    King() :
-        Piece(Type::king)
-    {}
+    King()
+    {
+        p_type = Type::king;
+        p_token = 'K';
+        spr_pos = sprite::king;
+    }
 
-	bool canMove(const position2d_t&);
+	bool canMove(pos2d_t const&);
 	bool canMove(const pos_t x, const pos_t y) {
         return canMove({x, y});
     }
@@ -81,19 +111,21 @@ public:
 
 class Queen : public Piece {
 public:
-	Queen(const pos_t& pos_x, const pos_t& pos_y) :
-		Piece(Type::queen, pos_x, pos_y)
-	{}
-
-	Queen(const position2d_t& pos) :
-		Queen(pos.x, pos.y)
-	{}
+    Queen(pos_t const& x, pos_t const& y) :
+        Queen()
+    {
+        atPos = { x,y };
+    }
+	Queen(pos2d_t const& pos) :
+		Queen(pos.x, pos.y) {}
     
-    Queen() :
-        Piece(Type::queen)
-    {}
+    Queen() {
+        p_type = Type::queen;
+        p_token = 'Q';
+        spr_pos = sprite::queen;
+    }
 
-	bool canMove(const position2d_t&);
+	bool canMove(pos2d_t const&);
 	bool canMove(const pos_t x, const pos_t y) {
         return canMove({x, y});
     }
@@ -101,19 +133,22 @@ public:
 
 class Bishop : public Piece {
 public:
-	Bishop(const pos_t& pos_x, const pos_t& pos_y) :
-		Piece(Type::bishop, pos_x, pos_y)
-	{}
+	Bishop(pos_t const& x, pos_t const& y) :
+        Bishop()
+    {
+        atPos = { x,y };
+    }
 
-	Bishop(const position2d_t& pos) :
-		Bishop(pos.x, pos.y)
-	{}
+	Bishop(pos2d_t const& pos) :
+		Bishop(pos.x, pos.y) {}
     
-    Bishop() :
-        Piece(Type::bishop)
-    {}
+    Bishop() { 
+        p_type = Type::bishop;
+        p_token = 'B';
+        spr_pos = sprite::bishop;
+    }
 
-	bool canMove(const position2d_t&);
+	bool canMove(pos2d_t const&);
 	bool canMove(const pos_t x, const pos_t y) {
         return canMove({x, y});
     }
@@ -121,19 +156,21 @@ public:
 
 class Knight : public Piece {
 public:
-	Knight(const pos_t& pos_x, const pos_t& pos_y) :
-		Piece(Type::knight, pos_x, pos_y)
-	{}
-
-	Knight(const position2d_t& pos) :
-		Knight(pos.x, pos.y)
-	{}
+    Knight(pos_t const& x, pos_t const& y) :
+        Knight()
+    {
+        atPos = { x,y };
+    }
+	Knight(pos2d_t const& pos) :
+		Knight(pos.x, pos.y) {}
     
-    Knight():
-        Piece(Type::knight)
-    {}
+    Knight() {
+        p_type = Type::knight;
+        p_token = 'N';
+        spr_pos = sprite::knight;
+    }
 
-	bool canMove(const position2d_t&);
+	bool canMove(pos2d_t const&);
 	bool canMove(const pos_t x, const pos_t y) {
         return canMove({x, y});
     }
@@ -141,19 +178,22 @@ public:
 
 class Rook : public Piece {
 public:
-	Rook(const pos_t& pos_x, const pos_t& pos_y) :
-		Piece(Type::rook, pos_x, pos_y)
-	{}
+    Rook(pos_t const& x, pos_t const& y) :
+        Rook()
+    {
+        atPos = { x,y };
+    }
 
-	Rook(const position2d_t& pos) :
-		Rook(pos.x, pos.y)
-	{}
+	Rook(pos2d_t const& pos) :
+		Rook(pos.x, pos.y) {}
     
-    Rook() :
-        Piece(Type::rook)
-    {}
+    Rook() {
+        p_type = Type::rook;
+        p_token = 'R';
+        spr_pos = sprite::rook;
+    }
 	
-	bool canMove(const position2d_t&);
+	bool canMove(pos2d_t const&);
 	bool canMove(const pos_t x, const pos_t y) {
         return canMove({x, y});
     }
@@ -161,23 +201,22 @@ public:
 
 class Pawn : public Piece {
 public:
-	Pawn(const pos_t& pos_x, const pos_t& pos_y, const direction& _face) :
-		Piece(Type::pawn, pos_x, pos_y)
-    {}
+    Pawn(pos_t const& x, pos_t const& y) :
+        Pawn()
+    {
+        atPos = { x,y };
+    }
 
-	Pawn(const position2d_t& pos, const direction& _face) :
-		Pawn(pos.x, pos.y, _face)
-	{}
+	Pawn(pos2d_t const& pos) :
+		Pawn(pos.x, pos.y) {}
     
-    Pawn(const pos_t& _x, const pos_t& _y) :
-        Piece(Type::pawn, _x, _y)
-    {}
-    
-    Pawn() :
-        Piece(Type::pawn)
-    {}
+    Pawn() {
+        p_type = Type::pawn;
+        p_token = 'P';
+        spr_pos = sprite::pawn;
+    }
 
-	bool canMove(const position2d_t&);
+	bool canMove(pos2d_t const&);
 	bool canMove(const pos_t x, const pos_t y) {
         return canMove({x, y});
     }

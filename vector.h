@@ -1,23 +1,10 @@
 #ifndef my_Vector_H
 #define my_Vector_H
-/*
-	this is a vector header file that takes much "inspiration" from
-	One Lone Coder, a.k.a javidx9, creator of the OLC Pixel Game Engine;
 
-	you may see the more epic implementation of a templated mathematical vector
-	found here:
-	https://github.com/OneLoneCoder/olcPixelGameEngine/blob/master/olcPixelGameEngine.h
-
-	he is a cool code artist.
-	check him out at: 
-	https://www.youtube.com/c/javidx9
-
-	anyways, here's somewhat 'original' code:
-*/
-
+#include <string>
 #include <compare>
 
-template <class T>
+template <typename T>
 struct vector2d {
 	T x{ 0 };
 	T y{ 0 };
@@ -54,7 +41,11 @@ struct vector2d {
     vector2d operator+(const vector2d& vec) { return vector2d(this->x + vec.x, this->y + vec.y); }
     vector2d operator-(const vector2d& vec) { return vector2d(this->x - vec.x, this->y - vec.y); }
     vector2d operator*(const vector2d& vec) { return vector2d(this->x * vec.x, this->y * vec.y); }
+	vector2d operator/(vector2d const& vec) { return vector2d(this->x / vec.x, this->y / vec.y); }
+	vector2d operator%(vector2d const& vec) { return vector2d(this->x % vec.x, this->y % vec.y); }
 };
+
+typedef vector2d<double>    vfloat_t;
 typedef vector2d<int8_t>	vi8_t;
 typedef vector2d<int16_t>	vi16_t;
 typedef vector2d<int32_t>	vi32_t;

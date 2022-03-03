@@ -1,28 +1,42 @@
 #include "Player.h"
 
-void constexpr Player::create_pieces() {
-    pos_t y{0}, fr{1};
-    
-    if (pl_team == Team::black){
+Player::Player(Team team) : pl_team{ team } {
+    int y{ 0 }, fr{ 1 }, spr_y{ 1 };
+
+    if (team == Team::black) {
         y = 7;
         fr = 6;
+        spr_y = 0;
     }
-    
-    pl_pieces.emplace_back(new Rook   ( 0, y ));
-    pl_pieces.emplace_back(new Knight ( 1, y ));
-    pl_pieces.emplace_back(new Bishop ( 2, y ));
-    pl_pieces.emplace_back(new Queen  ( 3, y ));
-    pl_pieces.emplace_back(new King   ( 4, y ));
-    pl_pieces.emplace_back(new Bishop ( 5, y ));
-    pl_pieces.emplace_back(new Knight ( 6, y ));
-    pl_pieces.emplace_back(new Rook   ( 7, y ));
-    
-    for (auto x{0}; x < 8; ++x)
-        pl_pieces.emplace_back(new Pawn(x, fr));
-    
- // assign player's team to each piece
-    for(auto& piece : pl_pieces)
-        piece->set_team(pl_team);
-    
-}
 
+    for (int x{ 0 }; x < 8; ++x) {
+        if
+            ((x == 0) || (x == 7))
+            pl_pieces.push_back(std::make_shared<Rook>(x, y));
+        else if
+            ((x == 1) || (x == 6))
+            pl_pieces.push_back(std::make_shared<Knight>(x, y));
+        else if
+            ((x == 2) || (x == 5))
+            pl_pieces.push_back(std::make_shared<Bishop>(x, y));
+        else if
+            (x == 4)
+            pl_pieces.push_back(std::make_shared<Queen>(x, y));
+        else if
+            (x == 3)
+            pl_pieces.push_back(std::make_shared<King>(x, y));
+
+        pl_pieces.push_back(std::make_shared<Pawn>(x, fr));
+
+    }
+
+    for (auto& piece : pl_pieces) {
+
+        piece->set_team(pl_team);
+        piece->get_sprite_pos().y = spr_y;
+
+        if (piece->type == Type::king)
+            crux = piece.get();
+    }
+
+}

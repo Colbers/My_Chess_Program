@@ -26,7 +26,9 @@ vector2d<T> West(vector2d<T> vec, int32_t N=1) {
 
 enum class cardinal {
 	null = 0,
-	north, east, south, west, northeast, northwest, southeast, southwest  
+	north, east, south, west,
+	northeast, northwest,
+	southeast, southwest  
 };
 
 struct Direction {

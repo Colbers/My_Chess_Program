@@ -1,8 +1,8 @@
-#include "MainLoop.h"
+#include "App.h"
 
 int main(int argc, char* argv[]) {
 
-	Chess::Run();
+	Application app{};
 
-	return 0;
+	return app.Run();
 }
