@@ -222,4 +222,19 @@ public:
     }
 };
 
+class Player;
+
+namespace alt {
+class King {
+public:
+    King(pos_t const& x, pos_t const& y) :
+        pos{ x, y } {}
+    
+    position2d_t pos;
+    Type type{ Type::king };
+    bool canMove(pos_t const& x, pos_t const& y);
+};
+
+}
+
 #endif

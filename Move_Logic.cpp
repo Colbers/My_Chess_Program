@@ -293,3 +293,4 @@ bool Legal_Move(Motion const& motion, Piece* crux) {
 
 	return false;  
 }
+
